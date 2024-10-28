@@ -1,6 +1,6 @@
 const express = require('express');
 const cors = require('cors');
-const sqlite3 = require('sqlite3').verbose();
+const mysql = require('mysql');
 const path = require('path');
 
 const app = express();
@@ -11,35 +11,37 @@ app.use(cors());
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public'))); // Servir arquivos estáticos
 
-// Conectar ao banco de dados SQLite
-const db = new sqlite3.Database('./database.db', (err) => {
-    if (err) {
-        console.error('Erro ao conectar ao banco de dados:', err.message);
-    } else {
-        console.log('Conectado ao banco de dados SQLite.');
-    }
+// Configurar conexão com o MySQL
+const db = mysql.createConnection({
+    host: 'localhost', // ou o endereço do seu servidor MySQL
+    user: 'root', // seu usuário do MySQL
+    password: '', // sua senha do MySQL
+    database: 'test' // nome do banco de dados que você criou
 });
 
-// Criar tabela se não existir
-db.run(`CREATE TABLE IF NOT EXISTS numeros (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    numero INTEGER NOT NULL
-);`);
+// Conectar ao MySQL
+db.connect(err => {
+    if (err) {
+        console.error('Erro ao conectar ao banco de dados MySQL:', err.message);
+        return;
+    }
+    console.log('Conectado ao banco de dados MySQL.');
+});
 
 // Endpoint para salvar número
 app.post('/api/salvar', (req, res) => {
     const { numero } = req.body;
-    db.run(`INSERT INTO numeros (numero) VALUES (?)`, [numero], function(err) {
+    db.query('INSERT INTO numeros (numero) VALUES (?)', [numero], (err, result) => {
         if (err) {
             return res.status(400).json({ error: err.message });
         }
-        res.status(201).json({ id: this.lastID });
+        res.status(201).json({ id: result.insertId });
     });
 });
 
 // Endpoint para buscar dados
 app.get('/api/dados', (req, res) => {
-    db.all(`SELECT * FROM numeros`, [], (err, rows) => {
+    db.query('SELECT * FROM numeros', (err, rows) => {
         if (err) {
             return res.status(500).json({ error: err.message });
         }
