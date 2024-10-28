@@ -28,7 +28,7 @@ db.connect(err => {
 
 // Rota para obter dados
 app.get('/api/dados', (req, res) => {
-    db.query('SELECT * FROM sua_tabela', (err, results) => {
+    db.query('SELECT * FROM numeros', (err, results) => {
         if (err) {
             return res.status(500).send(err);
         }
