@@ -1,13 +1,14 @@
-document.addEventListener('DOMContentLoaded', function() {
-    function fetchData() {
-        fetch('/api/dados')
-            .then(response => response.json())
-            .then(data => {
-                const dadosDiv = document.getElementById('dados');
-                dadosDiv.textContent = `Valor recebido: ${data.valor}`;
-            })
-            .catch(err => console.error('Erro ao buscar dados:', err));
+async function fetchData() {
+  try {
+    const response = await fetch('/api/dados'); // A URL deve ser relativa
+    if (!response.ok) {
+      throw new Error('Erro ao buscar dados: ' + response.status);
     }
+    const data = await response.json();
+    console.log(data);
+  } catch (error) {
+    console.error('Erro ao buscar dados:', error);
+  }
+}
 
-    setInterval(fetchData, 5000); // Atualiza os dados a cada 5 segundos
-});
+fetchData(); // Chama a função para buscar dados
