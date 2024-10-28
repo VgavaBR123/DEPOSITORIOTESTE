@@ -1,47 +1,53 @@
-document.getElementById('show-url-btn').addEventListener('click', function() {
-    const serverUrl = window.location.origin + '/api/dados';
-    document.getElementById('url-display').innerText = `URL do Servidor: ${serverUrl}`;
-    fetchData();
-});
-
-// Função para buscar dados
+// script.js
 async function fetchData() {
     try {
-        const response = await fetch('/api/dados');
+        const response = await fetch('http://localhost:3000/api/dados'); // Use a URL do seu servidor
         if (!response.ok) {
-            throw new Error('Erro ao buscar dados: ' + response.status);
+            throw new Error('Erro ao buscar dados');
         }
         const data = await response.json();
-        console.log(data);
+
+        // Limpa a lista antes de adicionar novos itens
+        const lista = document.getElementById('lista');
+        lista.innerHTML = '';
+
+        // Adiciona os dados na lista
+        data.forEach(item => {
+            const li = document.createElement('li');
+            li.textContent = JSON.stringify(item); // Aqui você pode formatar os dados como quiser
+            lista.appendChild(li);
+        });
     } catch (error) {
         console.error('Erro ao buscar dados:', error);
     }
 }
 
-// Função para enviar número
-async function enviarNumero(numero) {
+async function sendData(event) {
+    event.preventDefault(); // Previne o comportamento padrão do formulário
+
+    const valorInput = document.getElementById('valor');
+    const valor = valorInput.value;
+
     try {
-        const response = await fetch('/api/salvar', {
+        const response = await fetch('http://localhost:3000/api/adicionar', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({ numero })
+            body: JSON.stringify({ valor }) // Enviando o valor como JSON
         });
+
         if (!response.ok) {
-            throw new Error('Erro ao salvar número: ' + response.status);
+            throw new Error('Erro ao enviar dados');
         }
-        const result = await response.json();
-        console.log('Número salvo com ID:', result.id);
+
+        // Limpa o campo de input após o envio
+        valorInput.value = '';
+        fetchData(); // Atualiza a lista após enviar os dados
     } catch (error) {
-        console.error('Erro ao enviar número:', error);
+        console.error('Erro ao enviar dados:', error);
     }
 }
 
-// Exemplo: enviar um número ao clicar no botão
-document.getElementById('show-url-btn').addEventListener('click', function() {
-    const numero = prompt("Digite um número para salvar:");
-    if (numero) {
-        enviarNumero(Number(numero));
-    }
-});
+document.getElementById('botao').addEventListener('click', fetchData);
+document.getElementById('formulario').addEventListener('submit', sendData);

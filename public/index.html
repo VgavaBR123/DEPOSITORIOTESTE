@@ -3,12 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Exibir URL</title>
+    <title>Exemplo de Conexão com MySQL</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <h1>Exibir URL do Servidor</h1>
-    <button id="show-url-btn">Mostrar URL</button>
-    <p id="url-display"></p>
+    <h1>Dados do MySQL</h1>
+
+    <form id="formulario">
+        <label for="valor">Insira um valor:</label>
+        <input type="text" id="valor" required>
+        <button type="submit">Enviar</button>
+    </form>
+
+    <button id="botao">Buscar Dados</button>
+    <ul id="lista"></ul>
 
     <script src="script.js"></script>
 </body>

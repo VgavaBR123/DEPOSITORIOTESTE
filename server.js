@@ -1,55 +1,53 @@
 const express = require('express');
 const cors = require('cors');
 const mysql = require('mysql');
-const path = require('path');
 
 const app = express();
-const port = process.env.PORT || 3000;
+const port = 3000;
 
 // Middleware
 app.use(cors());
-app.use(express.json());
-app.use(express.static(path.join(__dirname, 'public'))); // Servir arquivos estáticos
+app.use(express.json()); // Para analisar requisições JSON
 
-// Configurar conexão com o MySQL
+// Configuração do MySQL
 const db = mysql.createConnection({
-    host: 'localhost', // ou o endereço do seu servidor MySQL
-    user: 'root', // seu usuário do MySQL
-    password: '', // sua senha do MySQL
-    database: 'test' // nome do banco de dados que você criou
+    host: 'localhost', // Ou o endereço do seu servidor MySQL
+    user: 'root',
+    password: '',
+    database: 'test'
 });
 
-// Conectar ao MySQL
+// Conexão ao MySQL
 db.connect(err => {
     if (err) {
-        console.error('Erro ao conectar ao banco de dados MySQL:', err.message);
-        return;
+        console.error('Erro ao conectar ao MySQL:', err);
+    } else {
+        console.log('Conectado ao MySQL!');
     }
-    console.log('Conectado ao banco de dados MySQL.');
 });
 
-// Endpoint para salvar número
-app.post('/api/salvar', (req, res) => {
-    const { numero } = req.body;
-    db.query('INSERT INTO numeros (numero) VALUES (?)', [numero], (err, result) => {
-        if (err) {
-            return res.status(400).json({ error: err.message });
-        }
-        res.status(201).json({ id: result.insertId });
-    });
-});
-
-// Endpoint para buscar dados
+// Rota para obter dados
 app.get('/api/dados', (req, res) => {
-    db.query('SELECT * FROM numeros', (err, rows) => {
+    db.query('SELECT * FROM sua_tabela', (err, results) => {
         if (err) {
-            return res.status(500).json({ error: err.message });
+            return res.status(500).send(err);
         }
-        res.json(rows);
+        res.json(results);
     });
 });
 
-// Iniciar servidor
+// Rota para adicionar dados
+app.post('/api/adicionar', (req, res) => {
+    const { valor } = req.body;
+    db.query('INSERT INTO sua_tabela (coluna) VALUES (?)', [valor], (err, result) => {
+        if (err) {
+            return res.status(500).send(err);
+        }
+        res.status(201).send('Valor adicionado com sucesso');
+    });
+});
+
+// Inicia o servidor
 app.listen(port, () => {
-    console.log(`Servidor rodando na porta ${port}`);
+    console.log(`Servidor rodando em http://localhost:${port}`);
 });
