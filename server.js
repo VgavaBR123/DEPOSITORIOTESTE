@@ -1,14 +1,22 @@
 const express = require('express');
-const path = require('path'); // Importa o módulo path
+const path = require('path');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Configura o Express para servir arquivos estáticos da pasta 'public'
+// Para aceitar requisições JSON
+app.use(express.json()); 
+
+// Serve arquivos estáticos da pasta 'public'
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Define uma rota para a página principal
+// Define a rota para /api/dados
+app.get('/api/dados', (req, res) => {
+  res.json({ message: 'Dados recebidos com sucesso!' });
+});
+
+// Define a rota para a página principal
 app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'index.html')); // Envia o arquivo index.html
+  res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
 // Inicia o servidor
